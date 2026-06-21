@@ -8,7 +8,7 @@ def get_combined_tech_stocks(tickers):
     end_date = datetime.datetime.today()
     start_date = end_date - datetime.timedelta(days=15 * 365)
 
-    all_data = []
+    all_data = {}
 
     print(
         f"Fetching data from {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}..."
@@ -16,53 +16,43 @@ def get_combined_tech_stocks(tickers):
 
     for ticker in tickers:
         print(f"Downloading data for {ticker}...")
-        try:
-            # Fetch historical data
-            df = yf.download(ticker, start=start_date, end=end_date)
 
-            if df.empty:
-                print(f"Warning: No data found for {ticker}")
-                continue
+        # Fetch historical data
+        df = yf.download(ticker, start=start_date, end=end_date)
 
-            # Flatten MultiIndex columns if present (yfinance modern behavior)
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
+        if df.empty:
+            print(f"Warning: No data found for {ticker}")
+            continue
 
-            # Reset index so 'Date' becomes a regular column
-            df = df.reset_index()
+        # Flatten MultiIndex columns if present (yfinance modern behavior)
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
 
-            # Add the ticker column
-            df["Ticker"] = ticker
+        # Reset index so 'Date' becomes a regular column
+        df = df.reset_index()
 
-            all_data.append(df)
+        # Add the ticker column
+        df["Ticker"] = ticker
 
-        except Exception as e:
-            print(f"Failed to download data for {ticker}: {e}")
+        all_data[ticker] = df
 
     # Combine all individual DataFrames into one large file
     if all_data:
-        combined_df = pd.concat(all_data, ignore_index=True)
+        # combined_df = pd.concat(all_data, ignore_index=True)
 
-        # Reorder columns to put Ticker first
-        cols = ["Ticker"] + [
-            col for col in combined_df.columns if col not in ["Ticker"]
-        ]
-        combined_df = combined_df[cols]
+        # # Reorder columns to put Ticker first
+        # cols = ["Ticker"] + [
+        #     col for col in combined_df.columns if col not in ["Ticker"]
+        # ]
+        # combined_df = combined_df[cols]
 
-        # Save to a single CSV file
-        output_file = "tech_stocks_15_years.csv"
-        combined_df.to_csv(output_file, index=False)
-        print(
-            f"\nSuccess! Combined data saved to '{output_file}'. Total rows: {len(combined_df)}"
-        )
-        return combined_df
+        # # Save to a single CSV file
+        # output_file = "tech_stocks_15_years.csv"
+        # combined_df.to_csv(output_file, index=False)
+        # print(
+        #     f"\nSuccess! Combined data saved to '{output_file}'. Total rows: {len(combined_df)}"
+        # )
+        return all_data
     else:
         print("No data was collected.")
         return None
-
-
-# Define the tech company tickers you want to pull
-tech_tickers = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META"]
-
-# Run the function
-combined_stock_data = get_combined_tech_stocks(tech_tickers)
