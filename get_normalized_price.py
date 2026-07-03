@@ -1,4 +1,5 @@
-def get_normalized_prices(prices, ticker, window=50):
+def get_normalized_prices(data, ticker, window=50):
+    prices = data[ticker]
     if prices["Date"].iloc[0] < prices["Date"].iloc[-1]:
         prices = prices[::-1].reset_index(drop=True)
 
@@ -14,9 +15,10 @@ def get_normalized_prices(prices, ticker, window=50):
         per_change = (prices["Close"].iloc[i + window] - prices["Close"].iloc[i + window - 1]) / prices["Close"].iloc[i + window - 1]
         
         temp = list(temp)
-        # temp.append(per_change)
+        temp.append(per_change)
         
-        # temp.append([prices["Date"].iloc[i], prices["Date"].iloc[i + window - 1]])
-        # temp.append(ticker)
+        temp.append([prices["Date"].iloc[i], prices["Date"].iloc[i + window - 1]])
+        temp.append(ticker)
         normalized_prices.append(temp)
+        
     return normalized_prices
