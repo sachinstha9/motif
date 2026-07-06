@@ -12,8 +12,10 @@ def get_normalized_prices(data, ticker, window=50):
         temp = prices["Close"].iloc[i:i+window]
         temp = (temp - min(temp)) / (max(temp) - min(temp))
         
-        per_change = (prices["Close"].iloc[i] - prices["Close"].iloc[i - 10]) / prices["Close"].iloc[i - 1]
+        per_change = (prices["Close"].iloc[i] - prices["Close"].iloc[i - 10]) / prices["Close"].iloc[i]
         
+        per_change *= per_change
+
         temp = list(temp)
         temp.append(per_change)
         

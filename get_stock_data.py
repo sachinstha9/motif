@@ -2,7 +2,6 @@ import datetime
 import pandas as pd
 import yfinance as yf
 
-
 def get_combined_tech_stocks(tickers):
     # Calculate the date range for the last 15 years
     end_date = datetime.datetime.today()
