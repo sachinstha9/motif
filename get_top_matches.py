@@ -68,7 +68,7 @@ def get_top_matches(target_pattern, historical_prices, price_window=50, dtw_wind
     for result in sorted_results:
         historical_date_end = datetime.strptime(result["historical_dates_end"], "%Y-%m-%d").date()
 
-        if len(top_matches) > n_top_match:
+        if len(top_matches) >= n_top_match:
             break
         
         add_date = True
